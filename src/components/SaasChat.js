@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Menu, X, Send, Paperclip, ChevronDown, Moon, Sun, 
+import { Menu, X, Send, Paperclip, Moon, Sun, 
   HelpCircle, MoreVertical, Download, Share2, 
-  User, Search, Pin, Sparkles, Bell, ChevronRight, 
-  ArrowRight, FileText, Zap, Briefcase, Code, 
+  User, Search, Sparkles, Bell, ChevronRight, 
+  FileText, Briefcase, Code, 
   BookOpen, Mail, Cpu, Monitor, Database } from 'lucide-react';
 
 // Portfolio sections data
