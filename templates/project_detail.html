@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="project-detail-container" style="max-width: 800px; margin: 0 auto;">
+    <div class="card" style="margin-bottom: 2rem;">
+        <div style="height: 300px; background-image: url('{{ url_for('static', filename='uploads/' + project.image) }}'); background-size: cover; background-position: center; border-top-left-radius: var(--border-radius); border-top-right-radius: var(--border-radius);"></div>
+        
+        <div style="padding: 2rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                <h1 style="font-size: 2rem;">{{ project.title }}</h1>
+                
+                <a href="{{ project.github_link }}" target="_blank" style="color: var(--text-secondary); font-size: 1.75rem;">
+                    <i class="fab fa-github"></i>
+                </a>
+            </div>
+            
+            <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1.5rem;">
+                {% for tag in project.tags %}
+                <span style="background-color: #374151; font-size: 0.875rem; padding: 0.35rem 0.75rem; border-radius: 9999px;">{{ tag }}</span>
+                {% endfor %}
+            </div>
+            
+            <div style="color: var(--text-secondary); white-space: pre-line;">{{ project.description }}</div>
+        </div>
+    </div>
+    
+    <a href="{{ url_for('public.projects') }}" style="display: inline-flex; align-items: center; gap: 0.5rem; color: var(--accent-color); text-decoration: none;">
+        <i class="fas fa-arrow-left"></i> Back to Projects
+    </a>
+</div>
+{% endblock %}

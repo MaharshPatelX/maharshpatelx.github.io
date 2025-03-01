@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}{{ profile.name }} - Machine Learning Engineer{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <a href="{{ url_for('public.index') }}" class="logo">{{ profile.name }}</a>
+        <nav>
+            <a href="{{ url_for('public.about') }}" {% if request.path == url_for('public.about') %}class="active"{% endif %}>About</a>
+            <a href="{{ url_for('public.resume') }}" {% if request.path == url_for('public.resume') %}class="active"{% endif %}>Resume</a>
+            <button class="contact-btn" id="contactBtn">Get in touch</button>
+            <button class="theme-toggle">
+                <i class="fas fa-sun"></i>
+            </button>
+        </nav>
+    </header>
+
+    <!-- Main Content -->
+    {% block content %}{% endblock %}
+
+    <!-- Footer -->
+    <footer>
+        <div class="social-links">
+            <a href="{{ profile.github }}" target="_blank">
+                <i class="fab fa-github"></i>
+            </a>
+            <a href="{{ profile.linkedin }}" target="_blank">
+                <i class="fab fa-linkedin"></i>
+            </a>
+            <a href="https://medium.com/@yourusername" target="_blank">
+                <i class="fab fa-medium"></i>
+            </a>
+        </div>
+        <p>Made with ❤️</p>
+    </footer>
+
+    <!-- Contact Modal -->
+    <div id="contactModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Get in Touch</h2>
+            <form id="contactForm">
+                <div class="form-group">
+                    <label for="name">Name</label>
+                    <input type="text" id="name" name="name" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" name="email" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="message">Message</label>
+                    <textarea id="message" name="message" rows="4" required></textarea>
+                </div>
+                
+                <button type="submit" id="submitBtn">Send Message</button>
+            </form>
+            <div id="successMessage" class="success-message">
+                <p>Message sent successfully!</p>
+                <p>Thanks for reaching out, I'll get back to you soon.</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

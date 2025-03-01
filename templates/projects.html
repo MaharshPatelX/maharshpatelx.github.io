@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!-- Projects Content -->
+<div class="projects-container">
+    <h1>Machine Learning Projects</h1>
+    
+    <div class="projects-grid">
+        {% for project in projects %}
+        <!-- Project Card -->
+        <div class="project-card">
+            <div class="project-image" style="background-image: url('{{ url_for('static', filename='uploads/' + project.image) }}')"></div>
+            <div class="project-content">
+                <div class="project-header">
+                    <h2>{{ project.title }}</h2>
+                    <a href="{{ project.github_link }}" target="_blank" class="github-link">
+                        <i class="fab fa-github"></i>
+                    </a>
+                </div>
+                <p>
+                    {{ project.description }}
+                </p>
+                <div class="project-tags">
+                    {% for tag in project.tags %}
+                    <span>{{ tag }}</span>
+                    {% endfor %}
+                </div>
+                {% if project.details_link %}
+                <a href="{{ project.details_link }}" class="project-details">View details &rarr;</a>
+                {% else %}
+                <a href="{{ url_for('public.project_detail', project_id=project._id) }}" class="project-details">View details &rarr;</a>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

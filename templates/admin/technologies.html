@@ -1,0 +1,163 @@
+{% extends "admin/base.html" %}
+
+{% block content_title %}Technologies Management{% endblock %}
+
+{% block content_header_buttons %}
+<a href="#" class="add-btn" onclick="showAddForm()">
+    <i class="fas fa-plus"></i> Add Technology
+</a>
+{% endblock %}
+
+{% block content %}
+<div id="technologiesList">
+    {% if technologies and technologies|length > 0 %}
+    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 1.5rem;">
+        {% for tech in technologies %}
+        <div style="background-color: #374151; border-radius: 0.5rem; padding: 1.5rem; display: flex; flex-direction: column; align-items: center; position: relative;">
+            <div style="position: absolute; top: 0.5rem; right: 0.5rem;">
+                <form action="{{ url_for('content.delete_technology', technology_id=tech._id) }}" method="POST" style="margin: 0;">
+                    <button type="submit" style="background: none; border: none; color: #9ca3af; cursor: pointer; padding: 0.25rem;">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </form>
+            </div>
+            
+            <div style="font-size: 3rem; margin-bottom: 1rem; color: var(--accent-color);">
+                <i class="{{ tech.icon }}"></i>
+            </div>
+            
+            <h3 style="font-size: 1.1rem; text-align: center;">{{ tech.name }}</h3>
+            <p style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 0.5rem; text-align: center;">{{ tech.icon }}</p>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div style="text-align: center; padding: 2rem;">
+        <p style="color: var(--text-secondary); margin-bottom: 1rem;">No technologies added yet.</p>
+        <a href="#" onclick="showAddForm()" style="color: var(--accent-color); text-decoration: none;">
+            <i class="fas fa-plus"></i> Add your first technology
+        </a>
+    </div>
+    {% endif %}
+</div>
+
+<div id="addTechnologyForm" style="display: none;">
+    <h2 style="font-size: 1.25rem; margin-bottom: 1.5rem;">Add New Technology</h2>
+    
+    <form action="{{ url_for('content.add_technology') }}" method="POST">
+        <div class="form-group">
+            <label for="name">Technology Name</label>
+            <input type="text" id="name" name="name" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="icon">Font Awesome Icon Class</label>
+            <input type="text" id="icon" name="icon" placeholder="fab fa-python" required>
+            <small style="color: var(--text-secondary); display: block; margin-top: 0.25rem;">Use Font Awesome icon classes (e.g., fab fa-python, fab fa-react, etc.)</small>
+        </div>
+        
+        <div style="margin-top: 2rem; margin-bottom: 1rem;">
+            <h3 style="font-size: 1rem; margin-bottom: 1rem;">Popular Technology Icons</h3>
+            <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 1rem;">
+                <div style="padding: 0.75rem; border: 1px solid #4b5563; border-radius: 0.5rem; cursor: pointer;" onclick="selectIcon('fab fa-python')">
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <i class="fab fa-python"></i>
+                        <span>fab fa-python</span>
+                    </div>
+                </div>
+                <div style="padding: 0.75rem; border: 1px solid #4b5563; border-radius: 0.5rem; cursor: pointer;" onclick="selectIcon('fab fa-react')">
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <i class="fab fa-react"></i>
+                        <span>fab fa-react</span>
+                    </div>
+                </div>
+                <div style="padding: 0.75rem; border: 1px solid #4b5563; border-radius: 0.5rem; cursor: pointer;" onclick="selectIcon('fab fa-node-js')">
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <i class="fab fa-node-js"></i>
+                        <span>fab fa-node-js</span>
+                    </div>
+                </div>
+                <div style="padding: 0.75rem; border: 1px solid #4b5563; border-radius: 0.5rem; cursor: pointer;" onclick="selectIcon('fab fa-js')">
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <i class="fab fa-js"></i>
+                        <span>fab fa-js</span>
+                    </div>
+                </div>
+                <div style="padding: 0.75rem; border: 1px solid #4b5563; border-radius: 0.5rem; cursor: pointer;" onclick="selectIcon('fab fa-html5')">
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <i class="fab fa-html5"></i>
+                        <span>fab fa-html5</span>
+                    </div>
+                </div>
+                <div style="padding: 0.75rem; border: 1px solid #4b5563; border-radius: 0.5rem; cursor: pointer;" onclick="selectIcon('fab fa-css3-alt')">
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <i class="fab fa-css3-alt"></i>
+                        <span>fab fa-css3-alt</span>
+                    </div>
+                </div>
+                <div style="padding: 0.75rem; border: 1px solid #4b5563; border-radius: 0.5rem; cursor: pointer;" onclick="selectIcon('fab fa-aws')">
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <i class="fab fa-aws"></i>
+                        <span>fab fa-aws</span>
+                    </div>
+                </div>
+                <div style="padding: 0.75rem; border: 1px solid #4b5563; border-radius: 0.5rem; cursor: pointer;" onclick="selectIcon('fab fa-docker')">
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <i class="fab fa-docker"></i>
+                        <span>fab fa-docker</span>
+                    </div>
+                </div>
+                <div style="padding: 0.75rem; border: 1px solid #4b5563; border-radius: 0.5rem; cursor: pointer;" onclick="selectIcon('fas fa-database')">
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <i class="fas fa-database"></i>
+                        <span>fas fa-database</span>
+                    </div>
+                </div>
+                <div style="padding: 0.75rem; border: 1px solid #4b5563; border-radius: 0.5rem; cursor: pointer;" onclick="selectIcon('fas fa-code')">
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <i class="fas fa-code"></i>
+                        <span>fas fa-code</span>
+                    </div>
+                </div>
+                <div style="padding: 0.75rem; border: 1px solid #4b5563; border-radius: 0.5rem; cursor: pointer;" onclick="selectIcon('fas fa-microchip')">
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <i class="fas fa-microchip"></i>
+                        <span>fas fa-microchip</span>
+                    </div>
+                </div>
+                <div style="padding: 0.75rem; border: 1px solid #4b5563; border-radius: 0.5rem; cursor: pointer;" onclick="selectIcon('fas fa-brain')">
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <i class="fas fa-brain"></i>
+                        <span>fas fa-brain</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div style="display: flex; gap: 1rem; justify-content: flex-end;">
+            <button type="button" class="cancel-btn" onclick="hideAddForm()" style="background-color: transparent; border: 1px solid #4b5563; color: var(--text-color); padding: 0.75rem 1.5rem; border-radius: 0.5rem; cursor: pointer;">Cancel</button>
+            <button type="submit" class="submit-btn">Add Technology</button>
+        </div>
+    </form>
+</div>
+
+{% block extra_js %}
+<script>
+    // Add Technology Form
+    function showAddForm() {
+        document.getElementById('technologiesList').style.display = 'none';
+        document.getElementById('addTechnologyForm').style.display = 'block';
+    }
+    
+    function hideAddForm() {
+        document.getElementById('technologiesList').style.display = 'block';
+        document.getElementById('addTechnologyForm').style.display = 'none';
+    }
+    
+    // Select Icon
+    function selectIcon(iconClass) {
+        document.getElementById('icon').value = iconClass;
+    }
+</script>
+{% endblock %}
+{% endblock %}

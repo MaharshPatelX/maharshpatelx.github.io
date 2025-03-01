@@ -1,0 +1,232 @@
+{% extends "admin/base.html" %}
+
+{% block content_title %}Projects Management{% endblock %}
+
+{% block content_header_buttons %}
+<a href="#" class="add-btn" onclick="showAddForm()">
+    <i class="fas fa-plus"></i> Add Project
+</a>
+{% endblock %}
+
+{% block content %}
+<div id="projectsList">
+    {% if projects and projects|length > 0 %}
+    <table class="table">
+        <thead>
+            <tr>
+                <th width="60">Image</th>
+                <th>Title</th>
+                <th>Tags</th>
+                <th>GitHub</th>
+                <th class="actions-cell">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for project in projects %}
+            <tr>
+                <td>
+                    <div style="width: 50px; height: 50px; border-radius: 4px; background-image: url('{{ url_for('static', filename='uploads/' + project.image) }}'); background-size: cover; background-position: center;"></div>
+                </td>
+                <td>{{ project.title }}</td>
+                <td>
+                    <div style="display: flex; flex-wrap: wrap; gap: 0.25rem;">
+                        {% for tag in project.tags %}
+                        <span style="background-color: #374151; font-size: 0.75rem; padding: 0.2rem 0.5rem; border-radius: 9999px;">{{ tag }}</span>
+                        {% endfor %}
+                    </div>
+                </td>
+                <td>
+                    <a href="{{ project.github_link }}" target="_blank" style="color: var(--accent-color); text-decoration: none;">
+                        <i class="fab fa-github"></i> GitHub
+                    </a>
+                </td>
+                <td class="actions-cell">
+                    <a href="#" class="action-btn edit" onclick="showEditForm('{{ project._id }}')">
+                        <i class="fas fa-edit"></i>
+                    </a>
+                    <a href="#" class="action-btn delete" onclick="confirmDelete('{{ project._id }}', '{{ project.title }}')">
+                        <i class="fas fa-trash"></i>
+                    </a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <div style="text-align: center; padding: 2rem;">
+        <p style="color: var(--text-secondary); margin-bottom: 1rem;">No projects added yet.</p>
+        <a href="#" onclick="showAddForm()" style="color: var(--accent-color); text-decoration: none;">
+            <i class="fas fa-plus"></i> Add your first project
+        </a>
+    </div>
+    {% endif %}
+</div>
+
+<div id="addProjectForm" style="display: none;">
+    <h2 style="font-size: 1.25rem; margin-bottom: 1.5rem;">Add New Project</h2>
+    
+    <form action="{{ url_for('content.add_project') }}" method="POST" enctype="multipart/form-data">
+        <div class="form-group">
+            <label for="title">Project Title</label>
+            <input type="text" id="title" name="title" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="description">Description</label>
+            <textarea id="description" name="description" required></textarea>
+        </div>
+        
+        <div class="form-group">
+            <label for="github_link">GitHub Link</label>
+            <input type="url" id="github_link" name="github_link" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="tags">Tags (comma-separated)</label>
+            <input type="text" id="tags" name="tags" placeholder="Python, TensorFlow, Computer Vision">
+        </div>
+        
+        <div class="form-group">
+            <label for="details_link">Details Link (optional)</label>
+            <input type="url" id="details_link" name="details_link">
+        </div>
+        
+        <div class="form-group">
+            <label for="image">Project Image</label>
+            <input type="file" id="image" name="image" accept="image/*">
+        </div>
+        
+        <div style="display: flex; gap: 1rem; justify-content: flex-end;">
+            <button type="button" class="cancel-btn" onclick="hideAddForm()" style="background-color: transparent; border: 1px solid #4b5563; color: var(--text-color); padding: 0.75rem 1.5rem; border-radius: 0.5rem; cursor: pointer;">Cancel</button>
+            <button type="submit" class="submit-btn">Add Project</button>
+        </div>
+    </form>
+</div>
+
+<div id="editProjectForm" style="display: none;">
+    <h2 style="font-size: 1.25rem; margin-bottom: 1.5rem;">Edit Project</h2>
+    
+    <form id="editForm" action="" method="POST" enctype="multipart/form-data">
+        <div class="form-group">
+            <label for="edit_title">Project Title</label>
+            <input type="text" id="edit_title" name="title" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="edit_description">Description</label>
+            <textarea id="edit_description" name="description" required></textarea>
+        </div>
+        
+        <div class="form-group">
+            <label for="edit_github_link">GitHub Link</label>
+            <input type="url" id="edit_github_link" name="github_link" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="edit_tags">Tags (comma-separated)</label>
+            <input type="text" id="edit_tags" name="tags">
+        </div>
+        
+        <div class="form-group">
+            <label for="edit_details_link">Details Link (optional)</label>
+            <input type="url" id="edit_details_link" name="details_link">
+        </div>
+        
+        <div class="form-group">
+            <label for="edit_image">Project Image</label>
+            <div id="current_image" style="margin-bottom: 0.5rem;"></div>
+            <input type="file" id="edit_image" name="image" accept="image/*">
+        </div>
+        
+        <div style="display: flex; gap: 1rem; justify-content: flex-end;">
+            <button type="button" class="cancel-btn" onclick="hideEditForm()" style="background-color: transparent; border: 1px solid #4b5563; color: var(--text-color); padding: 0.75rem 1.5rem; border-radius: 0.5rem; cursor: pointer;">Cancel</button>
+            <button type="submit" class="submit-btn">Update Project</button>
+        </div>
+    </form>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div id="deleteModal" class="modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.5); z-index: 1000; justify-content: center; align-items: center;">
+    <div class="modal-content" style="background-color: var(--card-bg); padding: 2rem; border-radius: var(--border-radius); max-width: 500px; width: 100%;">
+        <h3 style="font-size: 1.25rem; margin-bottom: 1rem;">Confirm Deletion</h3>
+        <p style="margin-bottom: 1.5rem; color: var(--text-secondary);">Are you sure you want to delete "<span id="deleteProjectName"></span>"? This action cannot be undone.</p>
+        
+        <div style="display: flex; justify-content: flex-end; gap: 1rem;">
+            <button onclick="hideDeleteModal()" style="background-color: transparent; border: 1px solid #4b5563; color: var(--text-color); padding: 0.5rem 1rem; border-radius: 0.5rem; cursor: pointer;">Cancel</button>
+            <form id="deleteForm" action="" method="POST">
+                <button type="submit" style="background-color: #ef4444; color: white; padding: 0.5rem 1rem; border: none; border-radius: 0.5rem; cursor: pointer;">Delete</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+    // Add Project Form
+    function showAddForm() {
+        document.getElementById('projectsList').style.display = 'none';
+        document.getElementById('addProjectForm').style.display = 'block';
+    }
+    
+    function hideAddForm() {
+        document.getElementById('projectsList').style.display = 'block';
+        document.getElementById('addProjectForm').style.display = 'none';
+    }
+    
+    // Edit Project Form
+    function showEditForm(projectId) {
+        // Fetch project data
+        fetch(`/api/projects/${projectId}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const project = data.project;
+                    
+                    // Set form action URL
+                    document.getElementById('editForm').action = `/api/projects/update/${projectId}`;
+                    
+                    // Populate form fields
+                    document.getElementById('edit_title').value = project.title;
+                    document.getElementById('edit_description').value = project.description;
+                    document.getElementById('edit_github_link').value = project.github_link;
+                    document.getElementById('edit_tags').value = project.tags.join(', ');
+                    document.getElementById('edit_details_link').value = project.details_link || '';
+                    
+                    // Show current image
+                    const currentImage = document.getElementById('current_image');
+                    currentImage.innerHTML = `
+                        <div style="display: flex; align-items: center; gap: 1rem;">
+                            <div style="width: 80px; height: 60px; border-radius: 4px; background-image: url('${project.image_url}'); background-size: cover; background-position: center;"></div>
+                            <span style="color: var(--text-secondary);">Current: ${project.image}</span>
+                        </div>
+                    `;
+                    
+                    // Show edit form
+                    document.getElementById('projectsList').style.display = 'none';
+                    document.getElementById('editProjectForm').style.display = 'block';
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching project data:', error);
+                alert('Failed to load project data. Please try again.');
+            });
+    }
+    
+    function hideEditForm() {
+        document.getElementById('projectsList').style.display = 'block';
+        document.getElementById('editProjectForm').style.display = 'none';
+    }
+    
+    // Delete Project
+    function confirmDelete(projectId, projectTitle) {
+        document.getElementById('deleteProjectName').textContent = projectTitle;
+        document.getElementById('deleteForm').action = `/api/projects/delete/${projectId}`;
+        document.getElementById('deleteModal').style.display = 'flex';
+    }
+    
+    function hideDeleteModal() {
+        document.getElementById('deleteModal').style.display = 'none';
+    }
+</script>
+{% endblock %}
+{% endblock %}

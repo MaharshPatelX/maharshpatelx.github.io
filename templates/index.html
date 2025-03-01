@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!-- Main content grid -->
+<div class="grid">
+    <!-- Bio Card -->
+    <div class="card bio-card">
+        <div class="bio-content">
+            <div class="profile-pic">
+                <div class="profile-circle" style="background-image: url('{{ url_for('static', filename='uploads/' + profile.profile_image) }}')"></div>
+            </div>
+            <div class="bio-text">
+                <h2>Hey, I'm {{ profile.name }} 👋</h2>
+                <p class="title">{{ profile.title }} 🤖</p>
+                <p class="description">
+                    {{ profile.bio }}
+                </p>
+            </div>
+            <div class="arrow">&raquo;</div>
+        </div>
+    </div>
+
+    <!-- Resume Card -->
+    <div class="card resume-card">
+        <a href="{{ url_for('public.resume') }}" class="card-link">
+            <i class="fas fa-file-alt"></i>
+            <h3>Resume</h3>
+        </a>
+    </div>
+
+    <!-- GitHub Card -->
+    <div class="card github-card">
+        <a href="{{ profile.github }}" target="_blank" class="card-link">
+            <i class="fab fa-github"></i>
+            <h3>GitHub</h3>
+        </a>
+    </div>
+
+    <!-- Projects Card -->
+    <div class="card projects-card">
+        <a href="{{ url_for('public.projects') }}" class="card-link">
+            <i class="fas fa-project-diagram"></i>
+            <h3>ML Projects</h3>
+        </a>
+    </div>
+
+    <!-- Technologies I like section -->
+    <div class="card tech-card">
+        <h3>Technologies I work with</h3>
+        <div class="tech-icons">
+            {% for tech in technologies %}
+                <i class="{{ tech.icon }}" title="{{ tech.name }}"></i>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

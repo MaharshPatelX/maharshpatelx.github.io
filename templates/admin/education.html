@@ -1,0 +1,196 @@
+{% extends "admin/base.html" %}
+
+{% block content_title %}Education Management{% endblock %}
+
+{% block content_header_buttons %}
+<a href="#" class="add-btn" onclick="showAddForm()">
+    <i class="fas fa-plus"></i> Add Education
+</a>
+{% endblock %}
+
+{% block content %}
+<div id="educationList">
+    {% if education and education|length > 0 %}
+    <div style="display: grid; gap: 1.5rem;">
+        {% for edu in education %}
+        <div style="background-color: #374151; border-radius: 0.5rem; padding: 1.5rem; position: relative;">
+            <div style="position: absolute; top: 1rem; right: 1rem; display: flex; gap: 0.5rem;">
+                <a href="#" class="action-btn edit" onclick="showEditForm('{{ edu._id }}')">
+                    <i class="fas fa-edit"></i>
+                </a>
+                <a href="#" class="action-btn delete" onclick="confirmDelete('{{ edu._id }}', '{{ edu.degree }}')">
+                    <i class="fas fa-trash"></i>
+                </a>
+            </div>
+            
+            <h3 style="font-size: 1.25rem; margin-bottom: 0.5rem;">{{ edu.degree }}</h3>
+            <p style="color: var(--text-secondary); margin-bottom: 1rem;">{{ edu.institution }} • {{ edu.start_date }} - {{ edu.end_date }}</p>
+            
+            {% if edu.description %}
+            <p style="color: var(--text-secondary);">{{ edu.description }}</p>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div style="text-align: center; padding: 2rem;">
+        <p style="color: var(--text-secondary); margin-bottom: 1rem;">No education entries added yet.</p>
+        <a href="#" onclick="showAddForm()" style="color: var(--accent-color); text-decoration: none;">
+            <i class="fas fa-plus"></i> Add your first education entry
+        </a>
+    </div>
+    {% endif %}
+</div>
+
+<div id="addEducationForm" style="display: none;">
+    <h2 style="font-size: 1.25rem; margin-bottom: 1.5rem;">Add New Education</h2>
+    
+    <form action="{{ url_for('content.add_education') }}" method="POST">
+        <div class="form-group">
+            <label for="degree">Degree / Certificate</label>
+            <input type="text" id="degree" name="degree" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="institution">Institution</label>
+            <input type="text" id="institution" name="institution" required>
+        </div>
+        
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+            <div class="form-group">
+                <label for="start_date">Start Date</label>
+                <input type="text" id="start_date" name="start_date" placeholder="2017" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="end_date">End Date</label>
+                <input type="text" id="end_date" name="end_date" placeholder="2021" required>
+            </div>
+        </div>
+        
+        <div class="form-group">
+            <label for="description">Description (optional)</label>
+            <textarea id="description" name="description" rows="4"></textarea>
+        </div>
+        
+        <div style="display: flex; gap: 1rem; justify-content: flex-end;">
+            <button type="button" class="cancel-btn" onclick="hideAddForm()" style="background-color: transparent; border: 1px solid #4b5563; color: var(--text-color); padding: 0.75rem 1.5rem; border-radius: 0.5rem; cursor: pointer;">Cancel</button>
+            <button type="submit" class="submit-btn">Add Education</button>
+        </div>
+    </form>
+</div>
+
+<div id="editEducationForm" style="display: none;">
+    <h2 style="font-size: 1.25rem; margin-bottom: 1.5rem;">Edit Education</h2>
+    
+    <form id="editForm" action="" method="POST">
+        <div class="form-group">
+            <label for="edit_degree">Degree / Certificate</label>
+            <input type="text" id="edit_degree" name="degree" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="edit_institution">Institution</label>
+            <input type="text" id="edit_institution" name="institution" required>
+        </div>
+        
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+            <div class="form-group">
+                <label for="edit_start_date">Start Date</label>
+                <input type="text" id="edit_start_date" name="start_date" placeholder="2017" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="edit_end_date">End Date</label>
+                <input type="text" id="edit_end_date" name="end_date" placeholder="2021" required>
+            </div>
+        </div>
+        
+        <div class="form-group">
+            <label for="edit_description">Description (optional)</label>
+            <textarea id="edit_description" name="description" rows="4"></textarea>
+        </div>
+        
+        <div style="display: flex; gap: 1rem; justify-content: flex-end;">
+            <button type="button" class="cancel-btn" onclick="hideEditForm()" style="background-color: transparent; border: 1px solid #4b5563; color: var(--text-color); padding: 0.75rem 1.5rem; border-radius: 0.5rem; cursor: pointer;">Cancel</button>
+            <button type="submit" class="submit-btn">Update Education</button>
+        </div>
+    </form>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div id="deleteModal" class="modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.5); z-index: 1000; justify-content: center; align-items: center;">
+    <div class="modal-content" style="background-color: var(--card-bg); padding: 2rem; border-radius: var(--border-radius); max-width: 500px; width: 100%;">
+        <h3 style="font-size: 1.25rem; margin-bottom: 1rem;">Confirm Deletion</h3>
+        <p style="margin-bottom: 1.5rem; color: var(--text-secondary);">Are you sure you want to delete "<span id="deleteEducationName"></span>"? This action cannot be undone.</p>
+        
+        <div style="display: flex; justify-content: flex-end; gap: 1rem;">
+            <button onclick="hideDeleteModal()" style="background-color: transparent; border: 1px solid #4b5563; color: var(--text-color); padding: 0.5rem 1rem; border-radius: 0.5rem; cursor: pointer;">Cancel</button>
+            <form id="deleteForm" action="" method="POST">
+                <button type="submit" style="background-color: #ef4444; color: white; padding: 0.5rem 1rem; border: none; border-radius: 0.5rem; cursor: pointer;">Delete</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+    // Add Education Form
+    function showAddForm() {
+        document.getElementById('educationList').style.display = 'none';
+        document.getElementById('addEducationForm').style.display = 'block';
+    }
+    
+    function hideAddForm() {
+        document.getElementById('educationList').style.display = 'block';
+        document.getElementById('addEducationForm').style.display = 'none';
+    }
+    
+    // Edit Education Form
+    function showEditForm(educationId) {
+        // Fetch education data
+        fetch(`/api/education/${educationId}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const education = data.education;
+                    
+                    // Set form action URL
+                    document.getElementById('editForm').action = `/api/education/update/${educationId}`;
+                    
+                    // Populate form fields
+                    document.getElementById('edit_degree').value = education.degree;
+                    document.getElementById('edit_institution').value = education.institution;
+                    document.getElementById('edit_start_date').value = education.start_date;
+                    document.getElementById('edit_end_date').value = education.end_date;
+                    document.getElementById('edit_description').value = education.description || '';
+                    
+                    // Show edit form
+                    document.getElementById('educationList').style.display = 'none';
+                    document.getElementById('editEducationForm').style.display = 'block';
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching education data:', error);
+                alert('Failed to load education data. Please try again.');
+            });
+    }
+    
+    function hideEditForm() {
+        document.getElementById('educationList').style.display = 'block';
+        document.getElementById('editEducationForm').style.display = 'none';
+    }
+    
+    // Delete Education
+    function confirmDelete(educationId, educationTitle) {
+        document.getElementById('deleteEducationName').textContent = educationTitle;
+        document.getElementById('deleteForm').action = `/api/education/delete/${educationId}`;
+        document.getElementById('deleteModal').style.display = 'flex';
+    }
+    
+    function hideDeleteModal() {
+        document.getElementById('deleteModal').style.display = 'none';
+    }
+</script>
+{% endblock %}
+{% endblock %}

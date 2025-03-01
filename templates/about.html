@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!-- About Content -->
+<div class="about-container">
+    <div class="about-content">
+        <h1>About Me</h1>
+        
+        <div class="about-text">
+            <p>
+                {{ profile.bio }}
+            </p>
+            
+            <h2>Professional Experience</h2>
+            {% for exp in experiences %}
+            <div class="experience-item">
+                <h3>{{ exp.title }}</h3>
+                <p class="company">{{ exp.company }} • {{ exp.start_date }} - {{ exp.end_date }}</p>
+                <ul>
+                    {% for resp in exp.responsibilities %}
+                    <li>{{ resp }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endfor %}
+            
+            <h2>Education</h2>
+            {% for edu in education %}
+            <div class="education-item">
+                <h3>{{ edu.degree }}</h3>
+                <p>{{ edu.institution }} • {{ edu.start_date }} - {{ edu.end_date }}</p>
+                {% if edu.description %}
+                <p>{{ edu.description }}</p>
+                {% endif %}
+            </div>
+            {% endfor %}
+            
+            <h2>Research Interests</h2>
+            <ul class="interests-list">
+                {% for interest in interests %}
+                <li>{{ interest.name }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %}
