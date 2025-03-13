@@ -79,7 +79,7 @@ def resume():
         publications=publications
     )
 
-@public_bp.route('/contact', methods=["POST"])
+@public_bp.route('/api/contact', methods=["POST"])
 def contact():
     """Handle contact form submissions."""
     try:
