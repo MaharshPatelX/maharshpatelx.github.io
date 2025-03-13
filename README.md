@@ -5,16 +5,13 @@
 ![MongoDB](https://img.shields.io/badge/MongoDB-4.5.0-green.svg)
 [![uv](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/uv/main/assets/badge/v0.json)](https://github.com/astral-sh/uv)
 
-A modern, responsive portfolio website for Machine Learning Engineers, built with Flask and MongoDB. This application provides a clean, professional interface for showcasing your ML projects, skills, and experience, with a complete admin panel for content management.
+A modern, responsive portfolio website  built with Flask and MongoDB. This application provides a clean, professional interface for showcasing your projects, skills, and experience, with a complete admin panel for content management.
 
-<!-- <p align="center">
-  <img src="static/preview.png" alt="ML Portfolio Preview" width="800">
-</p> -->
 
 ## Features
 
 - **Responsive Design**: Clean, dark-themed UI that works on all device sizes
-- **Project Showcase**: Highlight your ML projects with descriptions, tags, and images
+- **Project Showcase**: Highlight your projects with descriptions, tags, and images
 - **Skills & Technologies Display**: Showcase your technical skills and technologies
 - **Professional Timeline**: Display your work experience and education history
 - **Contact Form**: Allow visitors to send you messages directly
@@ -160,7 +157,7 @@ ml_portfolio/
 The admin panel allows you to manage all aspects of your portfolio:
 
 1. **Profile**: Update your personal information, bio, and profile image
-2. **Projects**: Add, edit, and delete ML projects with images and tags
+2. **Projects**: Add, edit, and delete projects with images and tags
 3. **Experience**: Manage your work history with detailed responsibilities
 4. **Education**: Track your educational background
 5. **Skills**: Add different skills categorized by type
