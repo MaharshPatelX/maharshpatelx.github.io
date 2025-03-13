@@ -175,34 +175,16 @@ To access the admin panel:
 2. Enter your admin credentials
 3. Navigate using the sidebar menu
 
-## Customization
 
-### Visual Theme
 
-Edit the CSS variables in `static/styles.css` to change the color scheme:
 
-```css
-:root {
-    --bg-color: #111827;
-    --card-bg: #1f2937;
-    --text-color: #ffffff;
-    --text-secondary: #9ca3af;
-    --accent-color: #3b82f6;
-    /* ... */
-}
-```
-
-### Content Layout
-
-Modify the templates in the `templates/` directory to change the layout and structure of your portfolio.
-
-# **🚀 Deploying Portfolio on AWS EC2 (Ubuntu)**
+## **🚀 Deploying Portfolio on AWS EC2 (Ubuntu)**
 
 This guide provides a step-by-step approach to deploying your **Portfolio Application** on an **AWS EC2** instance running Ubuntu. It includes server setup, domain configuration, HTTPS, and optimizing your production environment with **Gunicorn, Nginx, MongoDB, and SSL**.
 
 ---
 
-## **🛠 1. Launch an EC2 Instance**
+### **🛠 1. Launch an EC2 Instance**
 
 1. **Sign in to AWS Console** and navigate to EC2 service.
 2. **Launch a new instance**:
@@ -225,7 +207,7 @@ This guide provides a step-by-step approach to deploying your **Portfolio Applic
 
 ---
 
-## **🛠 2. Connect to your EC2 Instance**
+### **🛠 2. Connect to your EC2 Instance**
 
 ```bash
 # For Linux/Mac:
@@ -238,7 +220,7 @@ ssh -i your-key-pair.pem ubuntu@your-instance-public-ip
 
 ---
 
-## **🛠 3. Update System & Install Required Packages**
+### **🛠 3. Update System & Install Required Packages**
 
 ```bash
 sudo apt update && sudo apt upgrade -y
@@ -247,7 +229,7 @@ sudo apt install -y python3 python3-pip python3-venv build-essential libssl-dev 
 
 ---
 
-## **🛠 4. Install MongoDB**
+### **🛠 4. Install MongoDB**
 
 ```bash
 curl -fsSL https://pgp.mongodb.com/server-7.0.asc | sudo gpg -o /usr/share/keyrings/mongodb-server-7.0.gpg --dearmor
@@ -261,7 +243,7 @@ sudo systemctl status mongod
 
 ---
 
-## **🛠 5. Install `uv` (Fast Python Package Management)**
+### **🛠 5. Install `uv` (Fast Python Package Management)**
 
 ```bash
 curl -LsSf https://astral.sh/uv/install.sh | sh
@@ -274,7 +256,7 @@ uv --version
 
 ---
 
-## **🛠 6. Clone the Project & Install Dependencies**
+### **🛠 6. Clone the Project & Install Dependencies**
 
 ```bash
 mkdir portfolio
@@ -288,7 +270,7 @@ uv pip install -r requirements.txt
 
 ---
 
-## **🛠 7. Configure Gunicorn as a Background Service**
+### **🛠 7. Configure Gunicorn as a Background Service**
 
 ```bash
 sudo nano /etc/systemd/system/portfolio.service
@@ -325,7 +307,7 @@ sudo systemctl status portfolio
 
 ---
 
-## **🛠 8. Configure Nginx as a Reverse Proxy**
+### **🛠 8. Configure Nginx as a Reverse Proxy**
 
 ```bash
 sudo nano /etc/nginx/sites-available/portfolio
@@ -360,7 +342,7 @@ sudo systemctl restart nginx
 
 ---
 
-## **🛠 9. Fix Unix Socket & Directory Permissions**
+### **🛠 9. Fix Unix Socket & Directory Permissions**
 
 ```bash
 sudo chown ubuntu:www-data /home/ubuntu/portfolio/portfolio.sock
@@ -383,7 +365,7 @@ sudo systemctl restart nginx
 
 ---
 
-## **🛠 10. Set Up SSL with Let's Encrypt (Optional)**
+### **🛠 10. Set Up SSL with Let's Encrypt (Optional)**
 
 ```bash
 sudo apt install certbot python3-certbot-nginx -y
@@ -398,7 +380,7 @@ sudo certbot renew --dry-run
 
 ---
 
-## **🛠 11. Set Up Firewall for Security**
+### **🛠 11. Set Up Firewall for Security**
 
 ```bash
 sudo ufw allow OpenSSH
@@ -409,7 +391,7 @@ sudo ufw status
 
 ---
 
-## **🛠 12. Final Checks**
+### **🛠 12. Final Checks**
 
 After reboot, check:
 
