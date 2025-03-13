@@ -8,6 +8,10 @@ from datetime import timedelta
 # Base directory of the application
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
+# Admin credentials (for initial setup)
+ADMIN_USERNAME = os.getenv("ADMIN_USERNAME")
+ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD")
+
 # Environment settings
 ENV = os.getenv("FLASK_ENV", "development")
 DEBUG = ENV == "development"

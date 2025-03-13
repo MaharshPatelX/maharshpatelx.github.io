@@ -7,6 +7,8 @@ import logging
 from logging.handlers import RotatingFileHandler
 from flask import Flask
 from werkzeug.middleware.proxy_fix import ProxyFix
+from dotenv import load_dotenv
+load_dotenv()
 
 # Import configuration
 import config
