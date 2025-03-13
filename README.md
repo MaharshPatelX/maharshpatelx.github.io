@@ -196,20 +196,21 @@ Edit the CSS variables in `static/styles.css` to change the color scheme:
 
 Modify the templates in the `templates/` directory to change the layout and structure of your portfolio.
 
-## Deploying ML Portfolio on AWS EC2 (Ubuntu)
+# **🚀 Deploying Portfolio on AWS EC2 (Ubuntu)**
 
-This guide will walk you through deploying your ML Portfolio application on an AWS EC2 instance running Ubuntu, including setting up a domain, HTTPS, and proper server configuration.
+This guide provides a step-by-step approach to deploying your **Portfolio Application** on an **AWS EC2** instance running Ubuntu. It includes server setup, domain configuration, HTTPS, and optimizing your production environment with **Gunicorn, Nginx, MongoDB, and SSL**.
 
-### Step 1: Launch an EC2 Instance
+---
+
+## **🛠 1. Launch an EC2 Instance**
 
 1. **Sign in to AWS Console** and navigate to EC2 service.
-
 2. **Launch a new instance**:
    - Click "Launch Instance"
-   - Name: `ml-portfolio`
+   - Name: `my-portfolio`
    - Select Ubuntu Server 22.04 LTS (or newest LTS)
-   - Instance type: t2.micro (free tier) or t2.small for better performance
-   - Create a new key pair (save this .pem file securely)
+   - Instance type: `t2.micro` (free tier) or `t2.small` for better performance
+   - Create a new key pair (save this `.pem` file securely)
    - Configure security group to allow:
      - SSH (port 22) from your IP
      - HTTP (port 80) from anywhere
@@ -222,7 +223,9 @@ This guide will walk you through deploying your ML Portfolio application on an A
    - Allocate new address
    - Associate with your EC2 instance
 
-### Step 2: Connect to your EC2 instance
+---
+
+## **🛠 2. Connect to your EC2 Instance**
 
 ```bash
 # For Linux/Mac:
@@ -233,280 +236,188 @@ ssh -i your-key-pair.pem ubuntu@your-instance-public-ip
 # Convert .pem to .ppk using PuTTYgen first, then connect using PuTTY
 ```
 
-### Step 3: Update System and Install Dependencies
+---
+
+## **🛠 3. Update System & Install Required Packages**
 
 ```bash
-# Update package lists and upgrade packages
 sudo apt update && sudo apt upgrade -y
-
-# Install Python and required system packages
 sudo apt install -y python3 python3-pip python3-venv build-essential libssl-dev libffi-dev python3-dev git nginx
-
-# Install MongoDB (if you're hosting it on the same server)
-sudo apt install -y mongodb
-sudo systemctl start mongodb
-sudo systemctl enable mongodb
-
-# Or set up MongoDB Atlas (cloud-hosted) and use your connection string
 ```
 
-### Step 4: Install Poetry
+---
+
+## **🛠 4. Install MongoDB**
 
 ```bash
-# Install Poetry
-curl -sSL https://install.python-poetry.org | python3 -
-
-# Add Poetry to PATH
-echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc
-source ~/.bashrc
+curl -fsSL https://pgp.mongodb.com/server-7.0.asc | sudo gpg -o /usr/share/keyrings/mongodb-server-7.0.gpg --dearmor
+echo "deb [ arch=amd64,arm64 signed-by=/usr/share/keyrings/mongodb-server-7.0.gpg ] https://repo.mongodb.org/apt/ubuntu jammy/mongodb-org/7.0 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-7.0.list
+sudo apt update
+sudo apt install -y mongodb-org
+sudo systemctl start mongod
+sudo systemctl enable mongod
+sudo systemctl status mongod
 ```
 
-### Step 5: Clone and Set Up Your Application
+---
+
+## **🛠 5. Install `uv` (Fast Python Package Management)**
 
 ```bash
-# Create directory for application
-sudo mkdir -p /var/www/ml-portfolio
-sudo chown -R ubuntu:ubuntu /var/www/ml-portfolio
-
-# Clone your repository (or upload your code)
-cd /var/www/ml-portfolio
-git clone https://github.com/yourusername/ml-portfolio.git .
-
-# Install dependencies with Poetry
-poetry install --no-dev
-
-# Create logs directory
-mkdir -p logs
+curl -LsSf https://astral.sh/uv/install.sh | sh
+ls /home/ubuntu/.local/bin/uv
+export PATH=$PATH:/home/ubuntu/.local/bin
+echo 'export PATH=$PATH:/home/ubuntu/.local/bin' >> ~/.profile
+source ~/.profile
+uv --version
 ```
 
-### Step 6: Configure Environment Variables
+---
+
+## **🛠 6. Clone the Project & Install Dependencies**
 
 ```bash
-# Create .env file
-nano .env
+mkdir portfolio
+cd portfolio/
+git clone https://github.com/MaharshPatelX/maharshpatelx.github.io
+cd maharshpatelx.github.io/
+uv venv
+source .venv/bin/activate
+uv pip install -r requirements.txt
 ```
 
-Add the following content to the `.env` file:
+---
 
-```
-# Flask configuration
-FLASK_ENV=production
-FLASK_HOST=0.0.0.0
-FLASK_PORT=8000
-
-# Security
-SECRET_KEY=your-secure-random-key-here
-
-# MongoDB configuration (local)
-MONGO_URI=mongodb://localhost:27017/ml_portfolio
-
-# Or MongoDB Atlas
-# MONGO_URI=mongodb+srv://username:password@cluster.mongodb.net/ml_portfolio
-```
-
-Save and exit (Ctrl+X, then Y, then Enter).
-
-### Step 7: Set Up Gunicorn Service
-
-Create a systemd service file:
+## **🛠 7. Configure Gunicorn as a Background Service**
 
 ```bash
-sudo nano /etc/systemd/system/ml-portfolio.service
+sudo nano /etc/systemd/system/portfolio.service
 ```
 
-Add the following content:
+Paste this configuration:
 
 ```ini
 [Unit]
-Description=ML Portfolio Gunicorn daemon
+Description=Gunicorn instance to serve portfolio
 After=network.target
 
 [Service]
 User=ubuntu
 Group=www-data
-WorkingDirectory=/var/www/ml-portfolio
-Environment="PATH=/var/www/ml-portfolio/.venv/bin"
-EnvironmentFile=/var/www/ml-portfolio/.env
-ExecStart=/var/www/ml-portfolio/.venv/bin/gunicorn --workers 3 --bind 0.0.0.0:8000 wsgi:application
+WorkingDirectory=/home/ubuntu/portfolio/maharshpatelx.github.io
+Environment="PATH=/home/ubuntu/portfolio/maharshpatelx.github.io/.venv/bin"
+ExecStart=/home/ubuntu/portfolio/maharshpatelx.github.io/.venv/bin/gunicorn --workers 3 --limit-request-field_size 16384 --bind unix:/home/ubuntu/portfolio/portfolio.sock wsgi:application
 
 [Install]
 WantedBy=multi-user.target
 ```
 
-Save and exit, then activate the service:
+Save and exit (`CTRL+X`, then `Y`, then `Enter`).
+
+Enable and start Gunicorn:
 
 ```bash
-# Create Python virtual environment
-cd /var/www/ml-portfolio
-poetry config virtualenvs.in-project true
-poetry install --no-dev
-
-# Reload systemd, enable and start service
 sudo systemctl daemon-reload
-sudo systemctl start ml-portfolio
-sudo systemctl enable ml-portfolio
-sudo systemctl status ml-portfolio  # Verify it's running
+sudo systemctl start portfolio
+sudo systemctl enable portfolio
+sudo systemctl status portfolio
 ```
 
-### Step 8: Configure Nginx as Reverse Proxy
+---
 
-Create Nginx configuration:
+## **🛠 8. Configure Nginx as a Reverse Proxy**
 
 ```bash
-sudo nano /etc/nginx/sites-available/ml-portfolio
+sudo nano /etc/nginx/sites-available/portfolio
 ```
 
-Add the following content:
+Paste this configuration:
 
 ```nginx
 server {
     listen 80;
-    server_name your-domain.com www.your-domain.com;  # Replace with your domain
+    server_name your_ip_address;
+
+    client_max_body_size 16M;
 
     location / {
-        proxy_pass http://localhost:8000;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
+        include proxy_params;
+        proxy_pass http://unix:/home/ubuntu/portfolio/portfolio.sock;
     }
-
-    location /static/ {
-        alias /var/www/ml-portfolio/static/;
-        expires 30d;
-    }
-
-    location /uploads/ {
-        alias /var/www/ml-portfolio/static/uploads/;
-        expires 30d;
-    }
-
-    client_max_body_size 16M;  # Adjust based on your max upload size
 }
 ```
 
-Enable the site:
+Save and exit.
+
+Enable and restart Nginx:
 
 ```bash
-sudo ln -s /etc/nginx/sites-available/ml-portfolio /etc/nginx/sites-enabled/
-sudo nginx -t  # Test configuration
+sudo ln -s /etc/nginx/sites-available/portfolio /etc/nginx/sites-enabled/
+sudo rm /etc/nginx/sites-enabled/default
+sudo nginx -t
 sudo systemctl restart nginx
 ```
 
-### Step 9: Set Up SSL with Let's Encrypt (for HTTPS)
+---
+
+## **🛠 9. Fix Unix Socket & Directory Permissions**
 
 ```bash
-# Install Certbot
-sudo apt install -y certbot python3-certbot-nginx
+sudo chown ubuntu:www-data /home/ubuntu/portfolio/portfolio.sock
+sudo chmod 660 /home/ubuntu/portfolio/portfolio.sock
+```
 
-# Obtain SSL certificate
-sudo certbot --nginx -d your-domain.com -d www.your-domain.com
+Give Nginx **access to parent directories**:
 
-# This will modify your Nginx config automatically to redirect HTTP to HTTPS
+```bash
+sudo chmod +x /home/ubuntu
+sudo chmod +x /home/ubuntu/portfolio
+```
 
-# Test automatic renewal
+Restart services:
+
+```bash
+sudo systemctl restart portfolio
+sudo systemctl restart nginx
+```
+
+---
+
+## **🛠 10. Set Up SSL with Let's Encrypt (Optional)**
+
+```bash
+sudo apt install certbot python3-certbot-nginx -y
+sudo certbot --nginx -d yourdomain.com --redirect
+```
+
+Verify SSL renewal:
+
+```bash
 sudo certbot renew --dry-run
 ```
 
-### Step 10: Finalize Setup
+---
 
-1. **Make sure uploads directory is writable**:
-   ```bash
-   sudo mkdir -p /var/www/ml-portfolio/static/uploads
-   sudo chown -R ubuntu:www-data /var/www/ml-portfolio/static/uploads
-   sudo chmod -R 775 /var/www/ml-portfolio/static/uploads
-   ```
-
-2. **Set up database backups** (optional but recommended):
-   ```bash
-   # Install MongoDB tools
-   sudo apt install -y mongodb-clients
-   
-   # Create backup script
-   mkdir -p /var/www/ml-portfolio/backups
-   
-   nano /var/www/ml-portfolio/backup.sh
-   ```
-   
-   Add this content:
-   ```bash
-   #!/bin/bash
-   DATE=$(date +"%Y%m%d")
-   BACKUP_DIR="/var/www/ml-portfolio/backups"
-   
-   # Create backup
-   mongodump --db ml_portfolio --out $BACKUP_DIR/$DATE
-   
-   # Compress backup
-   tar -zcvf $BACKUP_DIR/$DATE.tar.gz $BACKUP_DIR/$DATE
-   
-   # Remove uncompressed backup
-   rm -rf $BACKUP_DIR/$DATE
-   
-   # Keep only last 7 backups
-   ls -t $BACKUP_DIR/*.tar.gz | tail -n +8 | xargs rm -f
-   ```
-   
-   Make it executable and set up a cron job:
-   ```bash
-   chmod +x /var/www/ml-portfolio/backup.sh
-   
-   # Add to crontab
-   (crontab -l ; echo "0 3 * * * /var/www/ml-portfolio/backup.sh") | crontab -
-   ```
-
-### Step 11: Create a Simple Deployment Script (Optional)
-
-Create a script to simplify future updates:
+## **🛠 11. Set Up Firewall for Security**
 
 ```bash
-nano /var/www/ml-portfolio/deploy.sh
+sudo ufw allow OpenSSH
+sudo ufw allow 'Nginx Full'
+sudo ufw enable
+sudo ufw status
 ```
 
-Add this content:
+---
+
+## **🛠 12. Final Checks**
+
+After reboot, check:
 
 ```bash
-#!/bin/bash
-cd /var/www/ml-portfolio
-
-# Pull latest changes
-git pull
-
-# Install dependencies
-poetry install --no-dev
-
-# Restart services
-sudo systemctl restart ml-portfolio
+sudo systemctl status portfolio
+sudo systemctl status nginx
 ```
 
-Make it executable:
-
-```bash
-chmod +x /var/www/ml-portfolio/deploy.sh
-```
-
-### Step 12: Security Hardening (Recommended)
-
-1. **Configure UFW (Uncomplicated Firewall)**:
-   ```bash
-   sudo ufw allow ssh
-   sudo ufw allow http
-   sudo ufw allow https
-   sudo ufw enable
-   ```
-
-2. **Fail2Ban to protect SSH**:
-   ```bash
-   sudo apt install -y fail2ban
-   sudo systemctl enable fail2ban
-   sudo systemctl start fail2ban
-   ```
-
-3. **Automatic security updates**:
-   ```bash
-   sudo apt install -y unattended-upgrades
-   sudo dpkg-reconfigure -plow unattended-upgrades
-   ```
 
 ## Troubleshooting
 
