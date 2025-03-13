@@ -3,7 +3,7 @@
 ![Python](https://img.shields.io/badge/Python-3.11+-blue.svg)
 ![Flask](https://img.shields.io/badge/Flask-2.3.3-green.svg)
 ![MongoDB](https://img.shields.io/badge/MongoDB-4.5.0-green.svg)
-![Poetry](https://img.shields.io/badge/Poetry-1.6.0+-blue.svg)
+[![uv](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/uv/main/assets/badge/v0.json)](https://github.com/astral-sh/uv)
 
 A modern, responsive portfolio website for Machine Learning Engineers, built with Flask and MongoDB. This application provides a clean, professional interface for showcasing your ML projects, skills, and experience, with a complete admin panel for content management.
 
@@ -27,7 +27,7 @@ A modern, responsive portfolio website for Machine Learning Engineers, built wit
 
 - **Backend**: Flask (Python web framework)
 - **Database**: MongoDB (via Flask-PyMongo)
-- **Dependency Management**: Poetry
+- **Dependency Management**: UV
 - **Frontend**: HTML5, CSS3, JavaScript
 - **UI Components**: Font Awesome icons
 - **Authentication**: Session-based authentication with password hashing
@@ -38,26 +38,36 @@ A modern, responsive portfolio website for Machine Learning Engineers, built wit
 ### Prerequisites
 
 - Python 3.11 or higher
-- Poetry (dependency management)
+- UV (dependency management)
 - MongoDB (local or Atlas cloud instance)
 
-### Setup with Poetry
+### Setup with UV
 
 1. **Clone the repository**
 
 ```bash
-git clone https://github.com/yourusername/ml-portfolio.git
-cd ml-portfolio
+git clone https://github.com/MaharshPatelX/maharshpatelx.github.io.git
+cd maharshpatelx.github.io
 ```
 
-2. **Install dependencies with Poetry**
+2. **Install dependencies with UV**
 
 ```bash
-# Install Poetry if you haven't already
-# curl -sSL https://install.python-poetry.org | python3 -
+# On macOS and Linux.
+curl -LsSf https://astral.sh/uv/install.sh | sh
 
-# Install project dependencies
-poetry install
+# On Windows.
+powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
+
+uv venv
+
+# On macOS and Linux.
+source .venv/bin/activate
+
+# On Windows.
+.venv\Scripts\activate
+
+uv pip install requirements.txt
 ```
 
 3. **Configure environment variables**
@@ -65,6 +75,10 @@ poetry install
 Create a `.env` file in the project root:
 
 ```
+# Admin credentials
+ADMIN_USERNAME=admin
+ADMIN_PASSWORD=admin123
+
 # Flask configuration
 FLASK_ENV=development
 FLASK_HOST=0.0.0.0
@@ -80,8 +94,11 @@ MONGO_URI=mongodb://localhost:27017/ml_portfolio
 4. **Initialize the application**
 
 ```bash
-# Activate the Poetry virtual environment
-poetry shell
+# On macOS and Linux.
+source .venv/bin/activate
+
+# On Windows.
+.venv\Scripts\activate
 
 # Run the application
 python app.py
@@ -105,9 +122,8 @@ ml_portfolio/
 ├── config.py               # Configuration settings
 ├── wsgi.py                 # WSGI entry point for production
 ├── extensions.py           # Flask extensions
-├── pyproject.toml          # Poetry configuration
 ├── README.md               # Project documentation
-├── requirements.txt        # Dependencies (for non-Poetry deployments)
+├── requirements.txt        # Dependencies (for deployments)
 ├── routes/                 # Route blueprints
 │   ├── __init__.py
 │   ├── public.py           # Public routes (index, about, etc)
@@ -137,26 +153,7 @@ ml_portfolio/
 └── logs/                   # Application logs
 ```
 
-## Using Poetry for Development
 
-Poetry provides a clean, dependency-isolated environment for this project. Here are some useful commands:
-
-```bash
-# Add a new dependency
-poetry add package-name
-
-# Add a development dependency
-poetry add --dev package-name
-
-# Update dependencies
-poetry update
-
-# Export dependencies to requirements.txt (for non-Poetry deployments)
-poetry export -f requirements.txt --output requirements.txt
-
-# Run commands in the virtual environment
-poetry run python app.py
-```
 
 ## Admin Panel Usage
 
@@ -413,4 +410,4 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 ---
 
-Built with ❤️ using Flask, MongoDB, and Poetry
+Built with ❤️ using Flask, MongoDB, and UV
